@@ -6,6 +6,18 @@ Mikroişlemciler dersi için **emu8086**'ya yerel macOS alternatifi olarak sıf�
 
 ---
 
+## Ekran Görüntüleri
+
+| Koyu Tema (Türkçe) — Kod, Yazmaçlar & 1 MB Bellek | Açık Tema (English) — Tek Adım & Bayrak Takibi |
+| :---: | :---: |
+| ![Koyu Tema Türkçe Arayüz](docs/screenshots/ui-dark-tr.jpg) | ![Açık Tema İngilizce Arayüz](docs/screenshots/ui-light-en.jpg) |
+
+| Uygulama İçi Adım Tablosu Önizleme | Otomatik Word (`.docx`) Ödev Raporu Çıktısı |
+| :---: | :---: |
+| ![Adım Adım Tablo Önizleme](docs/screenshots/trace-table-modal.jpg) | ![Word Raporu Çıktısı](docs/screenshots/word-export-report.jpg) |
+
+---
+
 ## Özellikler
 
 - **Sıfırdan 8086 Çekirdeği:** 1 MB düz bellek (`Uint8Array`), `(Segment << 4) + Offset` fiziksel adresleme, Little-Endian 16-bit bellek erişimi ve bağımsız 8/16-bit yazmaçlar (`AX–DX` / `AH–DL`, `SP`, `BP`, `SI`, `DI`, `IP`, `CS`, `DS`, `SS`, `ES`).
@@ -19,7 +31,7 @@ Mikroişlemciler dersi için **emu8086**'ya yerel macOS alternatifi olarak sıf�
 ## Kurulum
 
 ### 1) Hazır Uygulama (`.dmg`) ile Kurulum
-1. GitHub **Releases** sayfasından `EMU8086 Mac-x.x.x-universal.dmg` dosyasını indirin.
+1. [GitHub Releases](https://github.com/CelalTurkoglu/Emu8086_for_Mac/releases) sayfasından `EMU8086 Mac-0.1.0-universal.dmg` dosyasını indirin.
 2. `.dmg` dosyasını açıp **EMU8086 Mac** uygulamasını **Applications (Uygulamalar)** klasörüne sürükleyin.
 
 > **macOS İlk Açılış Notu:** Uygulama Apple Developer hesabı olmadan yerel ad-hoc imza ile derlendiği için internetten indirildiğinde macOS *"doğrulanamadı / hasarlı"* uyarısı gösterebilir.  
@@ -134,6 +146,7 @@ Emu8086_for_Mac/
 │   └── App.tsx
 ├── tests/                  # Vitest birim testleri (CPU, ALU/bayraklar, parser, .docx)
 ├── build/                  # macOS uygulama ikonu (.icns) ve imzalama/paketleme betikleri
+├── docs/screenshots/       # README ekran görüntüleri
 ├── LICENSE                 # MIT Lisansı
 └── package.json
 ```
