@@ -15,6 +15,7 @@ interface MemoryViewerProps {
   registers: IRegisterState;
   writtenAddresses: ReadonlySet<number>;
   externalJumpAddress: string | null;
+  externalJumpNonce?: number;
   onEditByte: (physicalAddress: number, newValue: number) => void;
 }
 
@@ -32,6 +33,7 @@ export const MemoryViewer: React.FC<MemoryViewerProps> = ({
   registers,
   writtenAddresses,
   externalJumpAddress,
+  externalJumpNonce = 0,
   onEditByte,
 }) => {
   const { t } = useI18n();
@@ -76,7 +78,7 @@ export const MemoryViewer: React.FC<MemoryViewerProps> = ({
       jumpToString(externalJumpAddress);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [externalJumpAddress]);
+  }, [externalJumpAddress, externalJumpNonce]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,7 +133,11 @@ export const MemoryViewer: React.FC<MemoryViewerProps> = ({
 
   const commitEditCell = () => {
     if (editingPhys === null) return;
-    const cleaned = editValue.trim().toUpperCase().replace(/^0X/, '').replace(/H$/, '');
+    const cleaned = editValue
+      .trim()
+      .toUpperCase()
+      .replace(/^0X/, '')
+      .replace(/H$/, '');
     if (/^[0-9A-F]{1,2}$/.test(cleaned)) {
       onEditByte(editingPhys, parseInt(cleaned, 16) & 0xff);
     }
@@ -266,8 +272,12 @@ export const MemoryViewer: React.FC<MemoryViewerProps> = ({
         <table className="w-full border-collapse select-none">
           <thead>
             <tr className="border-b border-neutral-200 text-[10px] text-neutral-400 dark:border-neutral-800 dark:text-neutral-500">
-              <th className="py-0.5 pr-3 text-left font-medium w-[92px]">SEG:OFF</th>
-              <th className="py-0.5 pr-3 text-left font-medium w-[62px]">PHYS</th>
+              <th className="py-0.5 pr-3 text-left font-medium w-[92px]">
+                SEG:OFF
+              </th>
+              <th className="py-0.5 pr-3 text-left font-medium w-[62px]">
+                PHYS
+              </th>
               {Array.from({ length: BYTES_PER_ROW }, (_, col) => (
                 <th
                   key={col}
@@ -278,7 +288,9 @@ export const MemoryViewer: React.FC<MemoryViewerProps> = ({
                   {formatHex(col, 2)}
                 </th>
               ))}
-              <th className="py-0.5 pl-4 text-left font-medium">{t.panels.ascii}</th>
+              <th className="py-0.5 pl-4 text-left font-medium">
+                {t.panels.ascii}
+              </th>
             </tr>
           </thead>
 
@@ -313,7 +325,9 @@ export const MemoryViewer: React.FC<MemoryViewerProps> = ({
                           autoFocus
                           maxLength={2}
                           value={editValue}
-                          onChange={(e) => setEditValue(e.target.value.toUpperCase())}
+                          onChange={(e) =>
+                            setEditValue(e.target.value.toUpperCase())
+                          }
                           onBlur={commitEditCell}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') commitEditCell();

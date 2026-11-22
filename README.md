@@ -1,8 +1,8 @@
-# Emu8086 for Mac
+# Emu8086 for Mac & Web
 
-Mikroişlemciler dersi için **emu8086**'ya yerel macOS alternatifi olarak sıfırdan **saf TypeScript** ile geliştirilmiş, harici emülatör kütüphanesi kullanmayan eğitim amaçlı Intel 8086 emülatörü ve adım adım hata ayıklayıcısı (debugger).
+Mikroişlemciler dersi için **emu8086**'ya yerel **macOS** ve **Online Web (Tarayıcı / PWA)** alternatifi olarak sıfırdan **saf TypeScript** ile geliştirilmiş, harici emülatör kütüphanesi kullanmayan eğitim amaçlı Intel 8086 emülatörü ve adım adım hata ayıklayıcısı (debugger).
 
-**Apple Silicon (M1–M4)** ve **Intel Mac** uyumludur. Arayüz **Türkçe / İngilizce (TR | EN)** ve **Açık / Koyu** tema seçeneklidir.
+**Web tarayıcıları (Windows, macOS, Linux, iPad/Tablet)**, **Apple Silicon (M1–M4)** ve **Intel Mac** uyumludur. Arayüz **Türkçe / İngilizce (TR | EN)**, **Açık / Koyu** tema ve **Sıkı / Esnek emu8086 Uyumluluk Modu** seçeneklidir.
 
 ---
 
@@ -20,18 +20,23 @@ Mikroişlemciler dersi için **emu8086**'ya yerel macOS alternatifi olarak sıf�
 
 ## Özellikler
 
-- **Sıfırdan 8086 Çekirdeği:** 1 MB düz bellek (`Uint8Array`), `(Segment << 4) + Offset` fiziksel adresleme, Little-Endian 16-bit bellek erişimi ve bağımsız 8/16-bit yazmaçlar (`AX–DX` / `AH–DL`, `SP`, `BP`, `SI`, `DI`, `IP`, `CS`, `DS`, `SS`, `ES`).
-- **Intel 8086 Bayrak Mantığı:** `OF`, `SF`, `ZF`, `AF`, `PF`, `CF` (ve `DF`, `IF`, `TF`) bayrakları her aritmetik/mantık komutunda Intel 8086 kurallarına göre güncellenir (`PF` yalnızca en düşük 8 biti denetler, `INC`/`DEC` `CF`'yi korur, `MOV` bayrakları değiştirmez).
-- **Etkileşimli Hata Ayıklama:** **Tek Adım** (`F8`), **Geri Al / Step Back** (`F7`), **Çalıştır** (`F9` — Anlık / Normal / Yavaş hız), aktif `CS:IP` satır vurgusu ve tıklayarak doğrudan düzenlenebilen 1 MB Hex/ASCII bellek görüntüleyici.
-- **Ödev İçin Word (`.docx`) Raporu:** **Tablo Kaydı** açıkken çalıştırılan her adım — döngü tekrarları (`#2`, `#3`…) dahil — kaydedilir; tek tıkla yatay (Landscape) Word dosyasına **Yazmaç & Bellek Tablosu**, **Bayrak Tablosu** ve **Kaynak Kod** olarak aktarılır.
-- **Yerel Dosya İşlemleri:** `.asm` dosya açma (`⌘O`), kaydetme (`⌘S`), farklı kaydetme (`⌘⇧S`), sürükle-bırak ve 6 hazır ders örneği.
+- **Sıfırdan 8086 Çekirdeği:** 1 MB düz bellek (`Uint8Array`), `(Segment << 4) + Offset` fiziksel adresleme, Little-Endian 16-bit bellek erişimi, gerçekçi Intel 8086 komut uzunlukları (`CS:IP`) ve bağımsız 8/16-bit yazmaçlar (`AX–DX` / `AH–DL`, `SP`, `BP`, `SI`, `DI`, `IP`, `CS`, `DS`, `SS`, `ES`).
+- **Intel 8086 Bayrak Mantığı:** `OF`, `SF`, `ZF`, `AF`, `PF`, `CF` (ve `DF`, `IF`, `TF`) bayrakları her aritmetik/mantık komutunda Intel 8086 kurallarına göre güncellenir (`PF` yalnızca en düşük 8 biti denetler, `INC`/`DEC` `CF`'yi korur, `MOV` bayrakları değiştirmez, kaydırma/döndürme komutları gerçek 8086 8-bit `CL` sayacını kullanır).
+- **Sıkı / Esnek `emu8086` Uyumluluk Modu:**
+  - **Sıkı Mod (Açık):** Gerçek Windows `emu8086` derleyicisi gibi belirsiz bellek boyutlarını (`BYTE PTR` / `WORD PTR` eksikliği), sabit değer taşmalarını (`MOV AL, 300`) ve değişken boyut uyuşmazlıklarını derleme zamanında yakalar.
+  - **Esnek Mod:** Ders slaytlarındaki kısaltılmış kullanımları (`MOV [0058H], 04H` gibi) sarı açıklamalı **Uyarı** ile çalıştırır ve öğrenciyi doğru sözdizimine yönlendirir.
+- **Etkileşimli Hata Ayıklama & Klavye/Ekran Kesmeleri:** **Tek Adım** (`F8`), **Geri Al / Step Back** (`F7`), **Çalıştır** (`F9` — Anlık / Normal / Yavaş hız), `INT 21H` (`AH=01H/07H/08H/0AH`) ve `INT 16H` (`AH=00H`) için canlı klavye girdisi, `INT 10H` (`AH=0EH`) ve `INT 21H` (`AH=02H/09H`) konsol çıktısı.
+- **Ödev İçin Word (`.docx`) Raporu:** **Tablo Kaydı** açıkken çalıştırılan her adım — döngü tekrarları (`#2`, `#3`…), segment ve bellek değişimleri dahil — kaydedilir; tek tıkla yatay (Landscape) Word dosyasına **Yazmaç & Bellek Tablosu**, **Bayrak Tablosu** ve **Kaynak Kod** olarak aktarılır.
+- **Hem Web Hem Masaüstü:**
+  - **Web Sürümü:** Kurulum gerektirmez, otomatik taslak kaydı (`localStorage`), tek tıkla **Link ile Kod Paylaşımı (`#code=...`)** ve çevrimdışı (PWA) çalışma desteği sunar.
+  - **macOS Masaüstü Sürümü:** Yerel `.asm` dosya diyalogları, kaydedilmemiş değişiklik koruması ve Finder entegrasyonu.
 
 ---
 
-## Kurulum
+## Kurulum ve Çalıştırma
 
-### 1) Hazır Uygulama (`.dmg`) ile Kurulum
-1. [GitHub Releases](https://github.com/CelalTurkoglu/Emu8086_for_Mac/releases) sayfasından `EMU8086 Mac-0.1.0-universal.dmg` dosyasını indirin.
+### 1) Hazır macOS Uygulaması (`.dmg`) ile Kurulum
+1. [GitHub Releases](https://github.com/CelalTurkoglu/Emu8086_for_Mac/releases) sayfasından `EMU8086 Mac-0.2.0-universal.dmg` dosyasını indirin.
 2. `.dmg` dosyasını açıp **EMU8086 Mac** uygulamasını **Applications (Uygulamalar)** klasörüne sürükleyin.
 
 > **macOS İlk Açılış Notu:** Uygulama Apple Developer hesabı olmadan yerel ad-hoc imza ile derlendiği için internetten indirildiğinde macOS *"doğrulanamadı / hasarlı"* uyarısı gösterebilir.  
@@ -40,7 +45,7 @@ Mikroişlemciler dersi için **emu8086**'ya yerel macOS alternatifi olarak sıf�
 > xattr -cr "/Applications/EMU8086 Mac.app"
 > ```
 
-### 2) Kaynak Koddan Çalıştırma ve Paketleme
+### 2) Kaynak Koddan Çalıştırma (Web & Masaüstü)
 Gereksinimler: **Node.js 20+** ve **npm**.
 
 ```bash
@@ -48,108 +53,67 @@ git clone https://github.com/CelalTurkoglu/Emu8086_for_Mac.git
 cd Emu8086_for_Mac
 npm install
 
-# Geliştirme modunda masaüstü uygulamasını başlat
+# Sadece Web sürümünü tarayıcıda başlat (http://localhost:5173)
+npm run dev:vite
+
+# Masaüstü (Electron) uygulamasını geliştirme modunda başlat
 npm run dev
 
-# Birim testlerini çalıştır (ALU, bayraklar, parser, döngü & .docx testi)
+# Birim ve güvenlik testlerini çalıştır
 npm test
+
+# Online yayın için statik Web paketi üret (dist/ klasörüne yazar — Vercel / Cloudflare / GitHub Pages uyumlu)
+npm run build:web
+npm run preview:web
 
 # Universal macOS .app / .dmg / .zip paketi üret (release/ klasörüne yazar)
 npm run pack:mac:universal
 ```
 
-*(Sadece Apple Silicon için daha küçük boyutlu paket: `npm run pack:mac`)*
-
 ---
 
 ## Nasıl Kullanılır?
 
-1. **Kodu Hazırlayın:** Editöre assembly kodunuzu yazın, üst bardan hazır **Ders Örnekleri**nden birini seçin veya `.asm` dosyanızı açın / pencereye sürükleyip bırakın.
-2. **Derle / Yükle (`⌘B`):** Kod ayrıştırılır, `.data` değişkenleri `DS:0000H` adresinden itibaren belleğe yüklenir ve `CS:IP` başlangıç komutuna ayarlanır.
-3. **Adım Adım İzleyin:** **Tek Adım (`F8`)** ile her komutta yazmaç, bayrak ve bellek değişimlerini inceleyin; **Geri Al (`F7`)** ile önceki adıma dönün veya **Çalıştır (`F9`)** ile programı çalıştırın.
-4. **Ödev Raporu (Word `.docx`):**
+1. **Kodu Hazırlayın:** Editöre assembly kodunuzu yazın, üst bardan hazır **Ders Örnekleri**nden birini seçin, `.asm` dosyanızı açın veya pencereye sürükleyip bırakın.
+2. **Sıkı / Esnek Modu Seçin:** Kodunuzu gerçek Windows `emu8086` kurallarıyla sınamak için üst bardaki **Sıkı Mod** düğmesini kullanın.
+3. **Derle / Yükle (`⌘B` / `Ctrl+B`):** Kod ayrıştırılır, komutlar `CS:IP` adreslerine ve `.data` değişkenleri `DS:0000H` adresinden itibaren belleğe yüklenir.
+4. **Adım Adım İzleyin:** **Tek Adım (`F8`)** ile her komutta yazmaç, bayrak ve bellek değişimlerini inceleyin; **Geri Al (`F7`)** ile önceki adıma dönün veya **Çalıştır (`F9`)** ile programı çalıştırın.
+5. **Ödev Raporu (Word `.docx`):**
    - Üst araç çubuğundaki **Tablo Kaydı** düğmesini açın.
    - Programı **Tek Adım** veya **Çalıştır** ile yürütün (döngüdeki her tur sırayla kaydedilir).
-   - **Tabloyu Gör** ile tabloları kontrol edip **Word (`.docx`)** (`⌘E`) ile kaydedin.
+   - **Tabloyu Gör** ile tabloları kontrol edip **Word (`.docx`)** (`⌘E` / `Ctrl+E`) ile kaydedin.
 
 | Kısayol | İşlev |
 | --- | --- |
-| `⌘B` | Derle / Yükle |
+| `⌘B` / `Ctrl+B` | Derle / Yükle |
 | `F8` / `F7` | Tek Adım / Geri Al |
 | `F9` | Çalıştır / Durdur |
-| `⌘N` / `⌘O` | Yeni / `.asm` Aç |
+| `⌘N` / `Ctrl+N` | Yeni Dosya |
+| `⌘O` / `Ctrl+O` | `.asm` Dosyası Aç |
 | `⌘S` / `⌘⇧S` | Kaydet / Farklı Kaydet |
-| `⌘E` | Tabloyu Word (`.docx`) Olarak Aktar |
+| `⌘E` / `Ctrl+E` | Tabloyu Word (`.docx`) Olarak Aktar |
 
 ---
 
-## Nasıl Çalışır? (Mimari & Teknik Detaylar)
+## Desteklenen Sözdizimi, Komutlar ve Kesmeler
 
-Emülatör motoru arayüzden tamamen bağımsız (`src/core/`) saf TypeScript modülleri olarak çalışır:
-
-```text
-Assembly Kaynak Kodu (.asm)
-  │
-  ▼  1. İki Geçişli Parser (src/core/parser.ts)
-  │     • Direktif çözümleme (ORG 100h, .model small, .data, .code, proc/endp)
-  │     • Sembol / etiket tablosu (ileri yönlü dallanmalar, EQU, DB/DW/DD)
-  │     • Komut AST ve adresleme modu ayrıştırma
-  ▼
-  │  2. Yürütme Motoru (src/core/executor.ts)
-  │     • CS:IP üzerinden komut yürütme + çağrı derinliği ve yığın yönetimi
-  │     • Tersine çevrilebilir bellek günlüğü (Step Back) ve adım kaydı (Trace)
-  ▼
-  ├──► ALU & Bayraklar (src/core/alu.ts)      → 8/16-bit aritmetik, mantık, kaydırma ve 8086 bayrakları
-  ├──► Yazmaç Dosyası (src/core/registers.ts) → 16-bit / H-L 8-bit bit maskeli senkron erişim
-  ├──► 1 MB Bellek (src/core/memory.ts)       → Uint8Array(0x100000), (Seg << 4) + Off, Little-Endian
-  └──► Word Üretici (src/core/docxExporter.ts)→ Kaydedilen adımlardan .docx tablo raporu
-```
-
-### Desteklenen Sözdizimi ve Komutlar
-- **Yönergeler:** `ORG 100h`, `.model small`, `.data`, `.code`, `main proc`, `endp`, `end main`, `DB`, `DW`, `DD`, `DUP`, `EQU`, `OFFSET`, `@DATA`, `.exit`
-- **Adresleme Modları:** Anlık (`MOV AX, 5`), Yazmaç (`MOV AX, BX`), Doğrudan Bellek (`MOV [0058H], 04H`), Dolaylı (`[BX]`, `[SI]`, `[DI]`, `[BP]`), Taban+İndis (`[BX+DI]`, `[BX][DI]`), Göreli (`ARRAY[SI+2]`), Segment Geçersiz Kılma (`DS:[1234H]`), `BYTE PTR` / `WORD PTR` (`b.` / `w.`)
+- **Yönergeler & İfadeler:** `ORG 100h`, `.model small`, `.stack`, `.data`, `.code`, `DATA SEGMENT ... DATA ENDS`, `CODE SEGMENT ... CODE ENDS`, `ASSUME`, `main proc`, `endp`, `end main`, `DB`, `DW`, `DD`, `DUP` (iç içe ve çoklu değer destekli), `EQU`, `OFFSET`, `SEG`, `@DATA`, `@CODE`, `$` konum sayacı (`LEN EQU $ - MSG`), sabit aritmetik ifadeleri (`'0' + 5`, `DATA1 + 2`), `.exit`
+- **Adresleme Modları:** Anlık (`MOV AX, 5`), Yazmaç (`MOV AX, BX`), Doğrudan Bellek (`MOV BYTE PTR [0058H], 04H`), Dolaylı (`[BX]`, `[SI]`, `[DI]`, `[BP]`), Taban+İndis (`[BX+DI]`, `[BX][DI]`, `[BX]+[SI]`, `[BX]+2`), Göreli (`ARRAY[SI+2]`, `DATA1+2`), Segment Geçersiz Kılma (`DS:[1234H]`, `ES:[DI]`), `BYTE PTR` / `WORD PTR` (`b.` / `w.`)
 - **Komut Grupları:**
-  - Veri & Yığın: `MOV`, `XCHG`, `LEA`, `PUSH`, `POP`, `CBW`, `CWD`
-  - Aritmetik: `ADD`, `ADC`, `SUB`, `SBB`, `INC`, `DEC`, `NEG`, `CMP`, `MUL`, `IMUL`, `DIV`, `IDIV`, `DAA`, `DAS`
-  - Mantık & Kaydırma: `AND`, `OR`, `XOR`, `NOT`, `TEST`, `SHL/SAL`, `SHR`, `SAR`, `ROL`, `ROR`, `RCL`, `RCR`
-  - Kontrol Akışı: `JMP`, `JZ/JE`, `JNZ/JNE`, `JC/JB`, `JNC/JAE`, `JA`, `JBE`, `JG`, `JGE`, `JL`, `JLE`, `JO`, `JNO`, `JS`, `JNS`, `JP`, `JNP`, `LOOP`, `LOOPE`, `LOOPNE`, `CALL`, `RET`, `HLT`, `NOP`
-  - Dizi & Kesme: `CLD`, `STD`, `CLC`, `STC`, `CMC`, `REP`/`REPE`/`REPNE` + `SCASB`, `CMPSB`, `MOVSB`, `STOSB`, `LODSB`, `INT 20H`, `INT 21H` (`AH=00H/02H/09H/4CH`)
-- **Varsayılan Segment Düzeni (emu8086 uyumlu):** `ORG 100h` için `CS=DS=SS=ES=0700H`, `IP=0100H`, `SP=FFFEH`; `.model small` için `CS=0710H`, `IP=0000H`, `DS=SS=ES=0700H`.
+  - **Veri, Tablo & Yığın:** `MOV`, `XCHG`, `LEA`, `LDS`, `LES`, `XLAT` / `XLATB`, `PUSH`, `POP`, `PUSHF`, `POPF`, `PUSHA`, `POPA`, `LAHF`, `SAHF`, `CBW`, `CWD`
+  - **Aritmetik & BCD:** `ADD`, `ADC`, `SUB`, `SBB`, `INC`, `DEC`, `NEG`, `CMP`, `MUL`, `IMUL`, `DIV`, `IDIV`, `DAA`, `DAS`, `AAA`, `AAS`, `AAM`, `AAD`
+  - **Mantık, Kaydırma & Döndürme:** `AND`, `OR`, `XOR`, `NOT`, `TEST`, `SHL`, `SAL`, `SHR`, `SAR`, `ROL`, `ROR`, `RCL`, `RCR`
+  - **Kontrol Akışı & Dallanma:** `JMP` (doğrudan, yazmaç ve `JMP TABLE[BX]` dolaylı bellek dahil), `JZ/JE`, `JNZ/JNE`, `JC/JB/JNAE`, `JNC/JAE/JNB`, `JA/JNBE`, `JBE/JNA`, `JG/JNLE`, `JGE/JNL`, `JL/JNGE`, `JLE/JNG`, `JO`, `JNO`, `JS`, `JNS`, `JP/JPE`, `JNP/JPO`, `JCXZ`, `LOOP`, `LOOPE/LOOPZ`, `LOOPNE/LOOPNZ`, `CALL` (etiket, yazmaç ve dolaylı bellek dahil), `RET`, `RETN`, `RETF`, `IRET`, `INTO`, `HLT`, `NOP`
+  - **Dizi & Bayrak Kontrolü:** `CLD`, `STD`, `CLC`, `STC`, `CMC`, `CLI`, `STI`, `REP`/`REPE`/`REPZ`/`REPNE`/`REPNZ` + `MOVSB`, `MOVSW`, `STOSB`, `STOSW`, `LODSB`, `LODSW`, `SCASB`, `SCASW`, `CMPSB`, `CMPSW`
+  - **Kesmeler (BIOS & DOS):**
+    - `INT 20H`: Programı sonlandır
+    - `INT 21H`: `AH=00H/4CH` (çıkış), `AH=01H` (yankılı karakter okuma), `AH=02H` (karakter yazdırma), `AH=06H` (doğrudan konsol G/Ç), `AH=07H/08H` (yankısız karakter okuma), `AH=09H` (`$` bitimli metin yazdırma), `AH=0AH` (tamponlu satır okuma), `AH=2AH` (sistem tarihi), `AH=2CH` (sistem saati)
+    - `INT 10H`: `AH=0EH` (Teletype karakter yazdırma), `AH=00H` (ekran temizleme)
+    - `INT 16H`: `AH=00H/10H` (klavyeden tuş bekleme), `AH=01H/11H` (tuş durumu kontrolü)
 
-### Teknoloji Yığını
-- **Çekirdek:** TypeScript (sıfırdan, harici emülatör yok)
-- **Arayüz:** React 18, Tailwind CSS, Lucide Icons, `docx`
-- **Masaüstü & Test:** Electron 33, Vite 6, Vitest, `electron-builder`
-
----
-
-## Klasör Yapısı
-
-```text
-Emu8086_for_Mac/
-├── electron/               # Electron ana süreç, macOS menü & dosya IPC köprüsü
-│   ├── main.ts
-│   └── preload.ts
-├── src/
-│   ├── core/               # Saf TypeScript 8086 emülatör çekirdeği
-│   │   ├── types.ts        # CPU, Bellek, Yazmaç, Bayrak ve AST arayüzleri
-│   │   ├── memory.ts       # 1 MB düz bellek ve fiziksel adres hesabı
-│   │   ├── registers.ts    # 16/8-bit yazmaçlar ve FLAGS biti paketleme
-│   │   ├── cpu.ts          # CPU durumu ve yığın (push16/pop16)
-│   │   ├── alu.ts          # Aritmetik/mantık ALU ve Intel 8086 bayrak kuralları
-│   │   ├── parser.ts       # İki geçişli assembly ayrıştırıcı
-│   │   ├── executor.ts     # Komut yürütücü, Step Back ve adım kaydı (trace)
-│   │   └── docxExporter.ts # Adım adım Word (.docx) ödev raporu üretici
-│   ├── components/         # React arayüz panelleri (TopBar, CodeEditor, RegistersPanel, MemoryViewer, TraceModal)
-│   ├── data/examples.ts    # Hazır ders örnekleri
-│   ├── i18n/               # Türkçe (tr) ve İngilizce (en) dil dosyaları
-│   └── App.tsx
-├── tests/                  # Vitest birim testleri (CPU, ALU/bayraklar, parser, .docx)
-├── build/                  # macOS uygulama ikonu (.icns) ve imzalama/paketleme betikleri
-├── docs/screenshots/       # README ekran görüntüleri
-├── LICENSE                 # MIT Lisansı
-└── package.json
-```
+### Bilinen Sınırlamalar (emu8086 Farkları)
+- Sanal donanım aygıtları (`IN` / `OUT` portlarına bağlı trafik ışığı, step motor, termometre vb.) ve harici `include 'emu8086.inc'` makro kütüphanesi bu eğitim emülatörünün kapsamı dışındadır.
+- Desteklenmeyen bir BIOS/DOS kesmesi çağrıldığında emülatör sessizce hata gizlemek yerine tanılama panelinde bilgilendirici bir uyarı gösterir.
 
 ---
 

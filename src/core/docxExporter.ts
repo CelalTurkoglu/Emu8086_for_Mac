@@ -16,7 +16,7 @@ import {
 } from 'docx';
 import { formatHex } from './memory';
 import { type ITraceEntry, type ITraceMemoryWrite } from './executor';
-import { type FlagName, type RegisterName } from './types';
+import { type FlagName, type RegisterName, type SegmentRegister } from './types';
 
 export interface IDocxExportOptions {
   programName: string;
@@ -57,14 +57,32 @@ const CELL_MARGINS = {
   right: 80,
 };
 
-function formatMemoryWrites(writes: readonly ITraceMemoryWrite[]): string {
-  if (writes.length === 0) return '—';
-  return writes
-    .map((w) => {
-      const valStr = w.size === 8 ? `${formatHex(w.value, 2)}H` : `${formatHex(w.value, 4)}H`;
-      return `${w.segmentReg}:[${formatHex(w.offset, 4)}H]=${valStr}`;
-    })
-    .join(', ');
+const TRACKED_SEGMENTS: SegmentRegister[] = ['DS', 'ES', 'SS', 'CS'];
+
+export function formatTraceMemoryAndSegments(
+  writes: readonly ITraceMemoryWrite[],
+  changedRegisters: readonly RegisterName[],
+  registers: ITraceEntry['registers']
+): string {
+  const parts: string[] = [];
+
+  for (const seg of TRACKED_SEGMENTS) {
+    if (changedRegisters.includes(seg)) {
+      parts.push(`${seg}=${formatHex(registers[seg], 4)}H`);
+    }
+  }
+
+  for (const w of writes) {
+    const valStr =
+      w.size === 8 ? `${formatHex(w.value, 2)}H` : `${formatHex(w.value, 4)}H`;
+    const repeatSuffix =
+      w.repeatCount && w.repeatCount > 1 ? ` (×${w.repeatCount})` : '';
+    parts.push(
+      `${w.segmentReg}:[${formatHex(w.offset, 4)}H]=${valStr}${repeatSuffix}`
+    );
+  }
+
+  return parts.length === 0 ? '—' : parts.join(', ');
 }
 
 function formatInstructionLabel(entry: ITraceEntry, locale: 'tr' | 'en'): string {
@@ -77,7 +95,11 @@ function formatInstructionLabel(entry: ITraceEntry, locale: 'tr' | 'en'): string
   return entry.instruction;
 }
 
-function makeHeaderCell(text: string, widthPct: number, align: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.CENTER): TableCell {
+function makeHeaderCell(
+  text: string,
+  widthPct: number,
+  align: (typeof AlignmentType)[keyof typeof AlignmentType] = AlignmentType.CENTER
+): TableCell {
   return new TableCell({
     width: { size: widthPct, type: WidthType.PERCENTAGE },
     shading: { type: ShadingType.CLEAR, color: 'auto', fill: COLOR_HEADER_BG },
@@ -155,7 +177,11 @@ function buildRegistersTable(
       makeHeaderCell('DI', 6),
       makeHeaderCell('BP', 6),
       makeHeaderCell('SP', 6),
-      makeHeaderCell(isTr ? 'Bellek Değişikliği' : 'Memory Writes', 18, AlignmentType.LEFT),
+      makeHeaderCell(
+        isTr ? 'Bellek / Segment Değişikliği' : 'Memory / Segment Writes',
+        18,
+        AlignmentType.LEFT
+      ),
     ],
   });
 
@@ -178,8 +204,12 @@ function buildRegistersTable(
         ? COLOR_ZEBRA_BG
         : undefined;
 
-    const memText = formatMemoryWrites(entry.memoryWrites);
-    const hasMemWrite = entry.memoryWrites.length > 0;
+    const memText = formatTraceMemoryAndSegments(
+      entry.memoryWrites,
+      entry.changedRegisters,
+      entry.registers
+    );
+    const hasMemOrSegWrite = memText !== '—';
 
     return new TableRow({
       cantSplit: true,
@@ -217,10 +247,10 @@ function buildRegistersTable(
         makeDataCell(memText, {
           widthPct: 18,
           align: AlignmentType.LEFT,
-          mono: hasMemWrite,
-          bold: hasMemWrite,
-          color: hasMemWrite ? COLOR_REG_CHANGED_TEXT : COLOR_MUTED,
-          fill: hasMemWrite ? COLOR_REG_CHANGED_BG : rowBaseFill,
+          mono: hasMemOrSegWrite,
+          bold: hasMemOrSegWrite,
+          color: hasMemOrSegWrite ? COLOR_REG_CHANGED_TEXT : COLOR_MUTED,
+          fill: hasMemOrSegWrite ? COLOR_REG_CHANGED_BG : rowBaseFill,
         }),
       ],
     });
@@ -472,8 +502,8 @@ export async function generateTraceDocx(
       children: [
         new TextRun({
           text: isTr
-            ? 'Her adımda değeri değişen yazmaçlar ve bellek yazmaları mavi ile vurgulanmıştır. Döngü tekrarları (#2, #3...) şeklinde gösterilir.'
-            : 'Registers and memory writes modified in each step are highlighted in blue. Loop iterations are marked as (#2, #3...).',
+            ? 'Her adımda değeri değişen yazmaçlar, segmentler ve bellek yazmaları mavi ile vurgulanmıştır. Döngü tekrarları (#2, #3...) şeklinde gösterilir.'
+            : 'Registers, segments, and memory writes modified in each step are highlighted in blue. Loop iterations are marked as (#2, #3...).',
           font: FONT_SANS,
           size: 17,
           color: COLOR_MUTED,
@@ -536,7 +566,7 @@ export async function generateTraceDocx(
   );
 
   const doc = new Document({
-    creator: 'EMU8086 Mac',
+    creator: 'EMU8086',
     title: `${programName} — EMU8086 Trace Report`,
     sections: [
       {

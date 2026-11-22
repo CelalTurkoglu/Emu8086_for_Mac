@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { loadSavedLocale, saveLocalePreference } from '../platform';
 import { en } from './en';
 import { tr } from './tr';
 import { type ITranslations, type Locale } from './types';
@@ -18,10 +19,17 @@ export const I18nProvider: React.FC<{
   defaultLocale?: Locale;
   children: React.ReactNode;
 }> = ({ defaultLocale = 'tr', children }) => {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const [locale, setLocaleState] = useState<Locale>(
+    () => loadSavedLocale() ?? defaultLocale
+  );
+
+  const setLocale = (next: Locale) => {
+    setLocaleState(next);
+    saveLocalePreference(next);
+  };
 
   const toggleLocale = () => {
-    setLocale((prev) => (prev === 'tr' ? 'en' : 'tr'));
+    setLocale(locale === 'tr' ? 'en' : 'tr');
   };
 
   return (

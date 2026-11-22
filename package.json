@@ -1,7 +1,7 @@
 {
   "name": "emu8086-mac",
   "productName": "EMU8086 Mac",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Native macOS educational Intel 8086 Microprocessor Emulator (emu8086 alternative)",
   "author": "Celal Türkoğlu",
   "license": "MIT",
@@ -17,12 +17,14 @@
     "dev:vite": "vite",
     "dev:electron": "npm run build:electron && wait-on http://localhost:5173 && ELECTRON_START_URL=http://localhost:5173 electron .",
     "build": "tsc --noEmit && vite build && npm run build:electron",
+    "build:web": "tsc --noEmit && vite build",
+    "preview:web": "vite preview --port 4173",
     "build:electron": "tsc -p tsconfig.electron.json",
     "pack:mac": "npm run build && node build/pack-mac.mjs --arm64",
     "pack:mac:universal": "npm run build && node build/pack-mac.mjs --universal",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
-    "test": "vitest run --pool=forks --no-file-parallelism",
-    "test:watch": "vitest --pool=forks"
+    "test": "vitest run tests --pool=forks --no-file-parallelism",
+    "test:watch": "vitest tests --pool=forks"
   },
   "build": {
     "appId": "com.emu8086mac.app",

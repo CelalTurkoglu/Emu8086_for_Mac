@@ -36,6 +36,8 @@ interface ElectronAPI {
   }) => Promise<ISaveFileResult>;
   openSavedFile: (filePath: string) => Promise<void>;
   revealInFinder: (filePath: string) => Promise<void>;
+  setUnsavedChanges?: (dirty: boolean) => Promise<void>;
+  openExternal?: (url: string) => Promise<void>;
   onMenuAction: (callback: (action: MenuFileAction) => void) => () => void;
 }
 

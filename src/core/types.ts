@@ -335,7 +335,7 @@ export interface ICPU {
 }
 
 // ---------------------------------------------------------------------------
-// Forward-Looking Operand & Instruction AST Types (for Steps 2 & 3)
+// Operand & Instruction AST Types
 // ---------------------------------------------------------------------------
 
 export type BaseRegister = 'BX' | 'BP';
@@ -352,6 +352,10 @@ export interface IImmediateOperand {
   value: number;
   /** Raw source representation (e.g. "0F5H", "'A'", "10110101b") */
   raw?: string;
+  /** True if resolved from a code label / OFFSET expression */
+  fromSymbol?: boolean;
+  /** Code label name if resolved from a code symbol (so offset recalculation updates it) */
+  codeLabelRef?: string;
 }
 
 export interface IMemoryOperand {
@@ -366,7 +370,9 @@ export interface IMemoryOperand {
   displacement: number;
   /** Symbolic label name if referencing a .data variable (e.g., ARRAY[SI]) */
   symbol?: string;
-  /** Explicit size override (BYTE PTR / b. / WORD PTR / w.) */
+  /** True if the user wrote an explicit BYTE PTR / WORD PTR / b. / w. qualifier */
+  explicitSize?: boolean;
+  /** Effective size hint (from explicit PTR or symbol definition) */
   sizeHint?: DataSize;
 }
 

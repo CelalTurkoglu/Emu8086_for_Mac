@@ -1,0 +1,17 @@
+{
+  "name": "EMU8086 — Intel 8086 Mikroişlemci Emülatörü",
+  "short_name": "EMU8086",
+  "description": "Eğitim amaçlı Intel 8086 Mikroişlemci Emülatörü, Adım Adım Hata Ayıklayıcı ve Word (.docx) Rapor Üretici",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#1c1c1e",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

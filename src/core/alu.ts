@@ -416,7 +416,8 @@ export function aluLogic(
 
 /**
  * Shift instructions: SHL, SAL, SHR, SAR
- * Updates CF (last shifted-out bit), OF (defined when count === 1), SF, ZF, PF.
+ * True Intel 8086 behavior: uses full 8-bit shift count (0..255), NOT 286+ 5-bit mask!
+ * Updates CF (last shifted-out bit), OF (updated on each 1-bit micro-step), SF, ZF, PF.
  * If count === 0, no flags change.
  */
 export function aluShift(
@@ -428,9 +429,8 @@ export function aluShift(
 ): IALUResult {
   const mask = getBitMask(size);
   const signBit = getSignBit(size);
-  const bits = size;
   let value = dest & mask;
-  const shifts = count & 0x1f;
+  const shifts = count & 0xff;
 
   if (shifts === 0) {
     return { result: value, flags: { ...currentFlags } };
@@ -443,13 +443,9 @@ export function aluShift(
     if (op === 'SHL' || op === 'SAL') {
       cf = (value & signBit) !== 0;
       value = (value << 1) & mask;
-      if (shifts === 1) {
-        of = ((value & signBit) !== 0) !== cf;
-      }
+      of = ((value & signBit) !== 0) !== cf;
     } else if (op === 'SHR') {
-      if (shifts === 1) {
-        of = (value & signBit) !== 0;
-      }
+      of = (value & signBit) !== 0;
       cf = (value & 1) !== 0;
       value = (value >>> 1) & mask;
     } else {
@@ -457,14 +453,9 @@ export function aluShift(
       const msb = value & signBit;
       cf = (value & 1) !== 0;
       value = ((value >>> 1) | msb) & mask;
-      if (shifts === 1) {
-        of = false;
-      }
+      of = false;
     }
   }
-
-  // Note: shifting >= bit width clears OF on multi-bit shifts; keep last state for shifts > 1
-  void bits;
 
   return {
     result: value,
@@ -481,7 +472,8 @@ export function aluShift(
 
 /**
  * Rotate instructions: ROL, ROR, RCL, RCR
- * Updates ONLY CF and (for count === 1) OF. Does NOT affect SF, ZF, AF, PF!
+ * True Intel 8086 behavior: uses full 8-bit count (0..255).
+ * Updates ONLY CF and OF. Does NOT affect SF, ZF, AF, PF!
  */
 export function aluRotate(
   op: 'ROL' | 'ROR' | 'RCL' | 'RCR',
@@ -493,7 +485,7 @@ export function aluRotate(
   const mask = getBitMask(size);
   const signBit = getSignBit(size);
   let value = dest & mask;
-  const shifts = count & 0x1f;
+  const shifts = count & 0xff;
 
   if (shifts === 0) {
     return { result: value, flags: { ...currentFlags } };
@@ -507,31 +499,23 @@ export function aluRotate(
       const msb = (value & signBit) !== 0 ? 1 : 0;
       cf = msb === 1;
       value = ((value << 1) | msb) & mask;
-      if (shifts === 1) {
-        of = ((value & signBit) !== 0) !== cf;
-      }
+      of = ((value & signBit) !== 0) !== cf;
     } else if (op === 'ROR') {
       const lsb = value & 1;
       cf = lsb === 1;
       value = ((value >>> 1) | (lsb ? signBit : 0)) & mask;
-      if (shifts === 1) {
-        const msb = (value & signBit) !== 0;
-        const nextMsb = (value & (signBit >>> 1)) !== 0;
-        of = msb !== nextMsb;
-      }
+      const msb = (value & signBit) !== 0;
+      const nextMsb = (value & (signBit >>> 1)) !== 0;
+      of = msb !== nextMsb;
     } else if (op === 'RCL') {
       const msb = (value & signBit) !== 0;
       const prevCf = cf ? 1 : 0;
       cf = msb;
       value = ((value << 1) | prevCf) & mask;
-      if (shifts === 1) {
-        of = ((value & signBit) !== 0) !== cf;
-      }
+      of = ((value & signBit) !== 0) !== cf;
     } else {
       // RCR
-      if (shifts === 1) {
-        of = ((value & signBit) !== 0) !== cf;
-      }
+      of = ((value & signBit) !== 0) !== cf;
       const lsb = (value & 1) !== 0;
       const prevCfBit = cf ? signBit : 0;
       cf = lsb;

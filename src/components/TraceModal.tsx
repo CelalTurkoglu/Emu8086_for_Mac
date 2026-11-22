@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { FileDown, Trash2, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, FileDown, Trash2, X } from 'lucide-react';
 import {
   formatHex,
+  formatTraceMemoryAndSegments,
   type FlagName,
   type ITraceEntry,
-  type ITraceMemoryWrite,
   type RegisterName,
 } from '../core';
 import { useI18n } from '../i18n';
@@ -13,6 +13,7 @@ interface TraceModalProps {
   open: boolean;
   traceLog: readonly ITraceEntry[];
   truncated: boolean;
+  isExporting?: boolean;
   onClose: () => void;
   onClear: () => void;
   onExportDocx: () => void;
@@ -31,30 +32,37 @@ const FLAG_COLS: Array<{ key: FlagName; label: string }> = [
   { key: 'TF', label: 'T (TF)' },
 ];
 
-function formatMemWrites(writes: readonly ITraceMemoryWrite[]): string {
-  if (writes.length === 0) return '—';
-  return writes
-    .map((w) => {
-      const val = w.size === 8 ? `${formatHex(w.value, 2)}H` : `${formatHex(w.value, 4)}H`;
-      return `${w.segmentReg}:[${formatHex(w.offset, 4)}H]=${val}`;
-    })
-    .join(', ');
-}
+const ROWS_PER_PAGE = 100;
 
 export const TraceModal: React.FC<TraceModalProps> = ({
   open,
   traceLog,
   truncated,
+  isExporting = false,
   onClose,
   onClear,
   onExportDocx,
 }) => {
   const { t } = useI18n();
   const [activeTab, setActiveTab] = useState<'registers' | 'flags'>('registers');
+  const [page, setPage] = useState<number>(1);
+
+  const totalPages = Math.max(1, Math.ceil(traceLog.length / ROWS_PER_PAGE));
+
+  useEffect(() => {
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
 
   if (!open) return null;
 
-  const executedCount = traceLog.filter((e) => !e.isInitial).length;
+  const executedCount = traceLog.length > 0 && traceLog[0].isInitial
+    ? traceLog.length - 1
+    : traceLog.filter((e) => !e.isInitial).length;
+
+  const startIdx = (page - 1) * ROWS_PER_PAGE;
+  const visibleRows = traceLog.slice(startIdx, startIdx + ROWS_PER_PAGE);
 
   return (
     <div
@@ -99,9 +107,38 @@ export const TraceModal: React.FC<TraceModalProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5">
+            {totalPages > 1 && (
+              <div className="mr-2 flex items-center gap-1 text-xs text-neutral-600 dark:text-neutral-300">
+                <button
+                  type="button"
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  title={t.trace.prevPage}
+                  className="rounded border border-neutral-300 bg-white p-1 hover:bg-neutral-100 disabled:opacity-40 dark:border-neutral-700 dark:bg-neutral-800"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5" />
+                </button>
+                <span className="px-1.5 font-mono text-[11px]">
+                  {t.trace.pageInfo} {page}/{totalPages}
+                </span>
+                <button
+                  type="button"
+                  disabled={page >= totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  title={t.trace.nextPage}
+                  className="rounded border border-neutral-300 bg-white p-1 hover:bg-neutral-100 disabled:opacity-40 dark:border-neutral-700 dark:bg-neutral-800"
+                >
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
+
             <button
               type="button"
-              onClick={onClear}
+              onClick={() => {
+                setPage(1);
+                onClear();
+              }}
               disabled={traceLog.length === 0}
               className="inline-flex items-center gap-1 rounded border border-neutral-300 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-40 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700"
             >
@@ -112,11 +149,13 @@ export const TraceModal: React.FC<TraceModalProps> = ({
             <button
               type="button"
               onClick={onExportDocx}
-              disabled={executedCount === 0}
+              disabled={executedCount === 0 || isExporting}
               className="inline-flex items-center gap-1.5 rounded border border-blue-600 bg-blue-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-40"
             >
               <FileDown className="h-3.5 w-3.5" />
-              <span>{t.trace.exportWord}</span>
+              <span>
+                {isExporting ? t.trace.exportingWord : t.trace.exportWord}
+              </span>
             </button>
 
             <button
@@ -146,7 +185,9 @@ export const TraceModal: React.FC<TraceModalProps> = ({
             <table className="w-full border-collapse font-mono text-xs">
               <thead className="sticky top-0 bg-neutral-100 dark:bg-[#252527]">
                 <tr className="border-b border-neutral-200 text-neutral-600 dark:border-neutral-700 dark:text-neutral-300">
-                  <th className="px-2 py-1.5 text-center font-semibold">{t.trace.colStep}</th>
+                  <th className="px-2 py-1.5 text-center font-semibold">
+                    {t.trace.colStep}
+                  </th>
                   <th className="px-2 py-1.5 text-left font-semibold">CS:IP</th>
                   <th className="px-2 py-1.5 text-left font-semibold">
                     {t.trace.colInstruction}
@@ -162,10 +203,14 @@ export const TraceModal: React.FC<TraceModalProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                {traceLog.map((entry, idx) => {
+                {visibleRows.map((entry, idx) => {
                   const changedSet = new Set(entry.changedRegisters);
-                  const memText = formatMemWrites(entry.memoryWrites);
-                  const hasMem = entry.memoryWrites.length > 0;
+                  const memText = formatTraceMemoryAndSegments(
+                    entry.memoryWrites,
+                    entry.changedRegisters,
+                    entry.registers
+                  );
+                  const hasMem = memText !== '—';
                   return (
                     <tr
                       key={`${entry.step}-${idx}`}
@@ -230,20 +275,25 @@ export const TraceModal: React.FC<TraceModalProps> = ({
             <table className="w-full border-collapse font-mono text-xs">
               <thead className="sticky top-0 bg-neutral-100 dark:bg-[#252527]">
                 <tr className="border-b border-neutral-200 text-neutral-600 dark:border-neutral-700 dark:text-neutral-300">
-                  <th className="px-2 py-1.5 text-center font-semibold">{t.trace.colStep}</th>
+                  <th className="px-2 py-1.5 text-center font-semibold">
+                    {t.trace.colStep}
+                  </th>
                   <th className="px-2 py-1.5 text-left font-semibold">CS:IP</th>
                   <th className="px-2 py-1.5 text-left font-semibold">
                     {t.trace.colInstruction}
                   </th>
                   {FLAG_COLS.map((f) => (
-                    <th key={f.key} className="px-2 py-1.5 text-center font-semibold">
+                    <th
+                      key={f.key}
+                      className="px-2 py-1.5 text-center font-semibold"
+                    >
                       {f.label}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                {traceLog.map((entry, idx) => {
+                {visibleRows.map((entry, idx) => {
                   const changedSet = new Set(entry.changedFlags);
                   return (
                     <tr

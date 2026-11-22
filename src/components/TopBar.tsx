@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Cpu,
   FileCode2,
   FileDown,
   FilePlus2,
@@ -9,6 +10,8 @@ import {
   RotateCcw,
   Save,
   SaveAll,
+  Share2,
+  ShieldCheck,
   Square,
   StepForward,
   Sun,
@@ -18,6 +21,7 @@ import {
 } from 'lucide-react';
 import { COURSE_EXAMPLES, type ICodeExample } from '../data/examples';
 import { useI18n } from '../i18n';
+import { isMacElectron } from '../platform';
 
 export type EmulatorStatus =
   | 'ready'
@@ -40,10 +44,14 @@ interface TopBarProps {
   selectedExampleId: string;
   currentFileName: string | null;
   hasUnsavedChanges: boolean;
+  strictMode: boolean;
   traceEnabled: boolean;
   traceStepCount: number;
+  isExportingDocx?: boolean;
   theme: ThemeMode;
   onToggleTheme: () => void;
+  onToggleStrictMode: () => void;
+  onShareLink: () => void;
   onRunSpeedChange: (speed: RunSpeed) => void;
   onNewFile: () => void;
   onOpenFile: () => void;
@@ -63,8 +71,7 @@ interface TopBarProps {
 const btnBase =
   'inline-flex items-center gap-1.5 rounded border px-2 py-1 text-xs font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
 
-const btnNeutral =
-  `${btnBase} border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700`;
+const btnNeutral = `${btnBase} border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 dark:hover:bg-neutral-700`;
 
 const btnSubtle =
   'inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-neutral-600 transition-colors hover:bg-neutral-200/70 hover:text-neutral-900 disabled:opacity-40 disabled:cursor-not-allowed dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-neutral-100';
@@ -79,10 +86,14 @@ export const TopBar: React.FC<TopBarProps> = ({
   selectedExampleId,
   currentFileName,
   hasUnsavedChanges,
+  strictMode,
   traceEnabled,
   traceStepCount,
+  isExportingDocx = false,
   theme,
   onToggleTheme,
+  onToggleStrictMode,
+  onShareLink,
   onRunSpeedChange,
   onNewFile,
   onOpenFile,
@@ -99,6 +110,7 @@ export const TopBar: React.FC<TopBarProps> = ({
   onExportDocx,
 }) => {
   const { locale, setLocale, t } = useI18n();
+  const macDesktop = isMacElectron();
 
   const statusText = t.status[status];
   const displayFileName = currentFileName ?? t.files.untitled;
@@ -116,10 +128,24 @@ export const TopBar: React.FC<TopBarProps> = ({
 
   return (
     <header className="shrink-0 select-none border-b border-neutral-200 bg-neutral-100 dark:border-neutral-800 dark:bg-[#242426]">
-      {/* Row 1: macOS Window Titlebar — File Actions, Active File, Examples, Theme & Language */}
-      <div className="macos-drag flex h-10 items-center justify-between gap-2 border-b border-neutral-200/80 pl-20 pr-3 dark:border-neutral-800">
-        {/* Left: File Operations & Examples */}
+      {/* Row 1: Window Titlebar — File Actions, Active File, Examples, Strict Mode, Share, Theme & Language */}
+      <div
+        className={`${
+          macDesktop ? 'macos-drag pl-20' : 'pl-3'
+        } flex h-10 items-center justify-between gap-2 border-b border-neutral-200/80 pr-3 dark:border-neutral-800`}
+      >
+        {/* Left: Brand (on Web) + File Operations & Examples */}
         <div className="macos-no-drag flex items-center gap-1 min-w-0">
+          {!macDesktop && (
+            <>
+              <div className="mr-1 flex items-center gap-1.5 rounded bg-blue-600/10 px-2 py-0.5 text-xs font-bold tracking-tight text-blue-700 dark:bg-blue-500/15 dark:text-blue-300">
+                <Cpu className="h-3.5 w-3.5 shrink-0" />
+                <span>EMU8086</span>
+              </div>
+              <div className="mx-1 h-4 w-px bg-neutral-300 dark:bg-neutral-700" />
+            </>
+          )}
+
           <button
             type="button"
             onClick={onNewFile}
@@ -164,6 +190,16 @@ export const TopBar: React.FC<TopBarProps> = ({
             <span>{t.files.saveAs}</span>
           </button>
 
+          <button
+            type="button"
+            onClick={onShareLink}
+            title={t.app.shareLinkTip}
+            className={`${btnSubtle} hidden sm:inline-flex`}
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            <span>{t.app.shareLink}</span>
+          </button>
+
           <div className="mx-1.5 h-4 w-px bg-neutral-300 dark:bg-neutral-700" />
 
           {/* Examples Dropdown */}
@@ -171,11 +207,13 @@ export const TopBar: React.FC<TopBarProps> = ({
             aria-label={t.toolbar.examples}
             value={selectedExampleId}
             onChange={(e) => {
-              const found = COURSE_EXAMPLES.find((ex) => ex.id === e.target.value);
+              const found = COURSE_EXAMPLES.find(
+                (ex) => ex.id === e.target.value
+              );
               if (found) onSelectExample(found);
             }}
             disabled={isRunning}
-            className="max-w-[230px] truncate rounded border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 cursor-pointer"
+            className="max-w-[220px] truncate rounded border border-neutral-300 bg-white px-2 py-1 text-xs text-neutral-700 focus:border-blue-500 focus:outline-none dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200 cursor-pointer"
           >
             <option value="" disabled>
               {t.toolbar.examples}…
@@ -189,19 +227,41 @@ export const TopBar: React.FC<TopBarProps> = ({
         </div>
 
         {/* Center: Active File Name */}
-        <div className="hidden md:flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-300 truncate max-w-[240px]">
+        <div className="hidden lg:flex items-center gap-1.5 text-xs text-neutral-600 dark:text-neutral-300 truncate max-w-[220px]">
           <FileCode2 className="h-3.5 w-3.5 shrink-0 text-neutral-400" />
           <span className="truncate font-medium">{displayFileName}</span>
           {hasUnsavedChanges && (
             <span
               title={t.status.modified}
-              className="h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400 dark:bg-neutral-500"
+              className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500"
             />
           )}
         </div>
 
-        {/* Right: Status, Theme, TR/EN */}
+        {/* Right: Strict Mode Toggle, Status, Theme, TR/EN */}
         <div className="macos-no-drag flex items-center gap-2 shrink-0">
+          {/* Strict emu8086 Compatibility Toggle */}
+          <button
+            type="button"
+            onClick={onToggleStrictMode}
+            disabled={isRunning}
+            title={t.app.strictModeTip}
+            className={`hidden md:inline-flex items-center gap-1 rounded border px-2 py-0.5 text-[11px] font-medium transition-colors ${
+              strictMode
+                ? 'border-amber-400 bg-amber-50 text-amber-900 hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/60 dark:text-amber-200'
+                : 'border-neutral-300 bg-white text-neutral-600 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300'
+            }`}
+          >
+            <ShieldCheck
+              className={`h-3.5 w-3.5 ${
+                strictMode ? 'text-amber-600 dark:text-amber-400' : 'text-neutral-400'
+              }`}
+            />
+            <span>
+              {strictMode ? t.app.strictModeOn : t.app.strictModeOff}
+            </span>
+          </button>
+
           <div className="hidden sm:flex items-center gap-1.5 rounded border border-neutral-200 bg-white px-2 py-0.5 text-[11px] text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
             <span className={`h-1.5 w-1.5 rounded-full ${statusDotClass}`} />
             <span className="font-medium">{statusText}</span>
@@ -259,9 +319,9 @@ export const TopBar: React.FC<TopBarProps> = ({
       </div>
 
       {/* Row 2: Execution Controls + Homework Trace & Word (.docx) Export */}
-      <div className="flex h-10 items-center justify-between gap-2 bg-neutral-50 px-3 dark:bg-[#1f1f21]">
+      <div className="flex flex-wrap min-h-[40px] items-center justify-between gap-2 bg-neutral-50 px-3 py-1 dark:bg-[#1f1f21]">
         {/* Left: Debugger Controls */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {/* Compile / Load */}
           <button
             type="button"
@@ -399,7 +459,7 @@ export const TopBar: React.FC<TopBarProps> = ({
           <button
             type="button"
             onClick={onExportDocx}
-            disabled={isRunning || traceStepCount === 0}
+            disabled={isRunning || traceStepCount === 0 || isExportingDocx}
             title={t.trace.exportWordTip}
             className={
               traceStepCount > 0
@@ -408,7 +468,9 @@ export const TopBar: React.FC<TopBarProps> = ({
             }
           >
             <FileDown className="h-3.5 w-3.5" />
-            <span>{t.trace.exportWord}</span>
+            <span>
+              {isExportingDocx ? t.trace.exportingWord : t.trace.exportWord}
+            </span>
           </button>
         </div>
       </div>

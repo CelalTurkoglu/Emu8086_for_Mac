@@ -7,6 +7,13 @@ export interface ITranslations {
     languageLabel: string;
     themeLight: string;
     themeDark: string;
+    strictModeLabel: string;
+    strictModeOn: string;
+    strictModeOff: string;
+    strictModeTip: string;
+    shareLink: string;
+    shareLinkTip: string;
+    shareLinkCopied: string;
   };
   files: {
     newFile: string;
@@ -21,6 +28,11 @@ export interface ITranslations {
     savedNotice: string;
     openedNotice: string;
     dropHint: string;
+    unsavedTitle: string;
+    unsavedMessage: string;
+    saveAndContinue: string;
+    discardChanges: string;
+    cancel: string;
   };
   trace: {
     recordLabel: string;
@@ -30,7 +42,9 @@ export interface ITranslations {
     stepsRecorded: string;
     previewTable: string;
     exportWord: string;
+    exportingWord: string;
     exportWordTip: string;
+    exportError: string;
     clearTrace: string;
     wordSavedNotice: string;
     openInWord: string;
@@ -43,6 +57,9 @@ export interface ITranslations {
     initialState: string;
     emptyNotice: string;
     truncatedNotice: string;
+    pageInfo: string;
+    prevPage: string;
+    nextPage: string;
     close: string;
   };
   toolbar: {
@@ -87,8 +104,14 @@ export interface ITranslations {
     cycles: string;
     diagnostics: string;
     noErrors: string;
+    warningBadge: string;
     consoleOutput: string;
     clearConsole: string;
+    inputWaitingChar: string;
+    inputWaitingLine: string;
+    inputPlaceholderChar: string;
+    inputPlaceholderLine: string;
+    inputSend: string;
     regHigh: string;
     regLow: string;
     unsignedDec: string;

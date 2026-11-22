@@ -5,11 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none';"
     />
-    <title>EMU8086 Mac — 8086 Mikroişlemci Emülatörü</title>
+    <meta
+      name="description"
+      content="Intel 8086 Mikroişlemci Emülatörü, Adım Adım Hata Ayıklayıcı (Debugger), 1 MB Bellek Görüntüleyici ve Otomatik Word (.docx) Ödev Raporu Üretici — Web & macOS"
+    />
+    <meta name="theme-color" content="#2563eb" />
+    <meta property="og:title" content="EMU8086 — Intel 8086 Mikroişlemci Emülatörü (Web & Mac)" />
+    <meta
+      property="og:description"
+      content="Tarayıcıda veya macOS'ta kurulumsuz çalışan eğitim amaçlı Intel 8086 emülatörü, bayrak/bellek takipçisi ve adım adım Word (.docx) rapor üreticisi."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <title>EMU8086 — 8086 Mikroişlemci Emülatörü</title>
   </head>
-  <body class="bg-slate-950 text-slate-100 antialiased selection:bg-sky-500/30">
+  <body class="bg-neutral-100 text-neutral-900 dark:bg-[#1c1c1e] dark:text-neutral-100 antialiased selection:bg-blue-500/25">
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

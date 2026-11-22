@@ -24,8 +24,9 @@ export const COURSE_EXAMPLES: ICodeExample[] = [
 .code
 main proc
     ; Doğrudan bellek yazma (DS = 0700H -> Fiziksel 07053H ve 07058H)
-    MOV [0053H], 12H
-    MOV [0058H], 04H
+    ; Not: Gerçek emu8086 uyumu için BYTE PTR (veya b.) kullanılır
+    MOV BYTE PTR [0053H], 12H
+    MOV BYTE PTR [0058H], 04H
 
     ; Taban + İndis adresleme: BX + DI = 0050H + 0003H = 0053H
     MOV BX, 0050H
@@ -100,7 +101,7 @@ ORG 100h
     MOV CL, 01H
     DEC CL                ; CL=00H, ZF=1, PF=1, ancak CF hâlâ 1!
 
-    ; 5) Çıkarma (Borç): 22H - 44H = DEH -> CF=1, SF=1, AF=0, PF=1, OF=0
+    ; 5) Çıkarma (Borç): 22H - 44H = DEH -> CF=1, SF=1, AF=1 (alt nibble borç), PF=1, OF=0
     MOV CH, 22H
     SUB CH, 44H
 
