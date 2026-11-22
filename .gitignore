@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+dist-electron/
+release/
+coverage/
+*.tsbuildinfo
+
+# Packaged installers & exported reports
+*.dmg
+*.zip
+*.blockmap
+*.docx
+
+# OS & Editor files
+.DS_Store
+**/.DS_Store
+.vscode/
+.idea/
+
+# Logs & local env
+*.log
+npm-debug.log*
+.env
+.env.*

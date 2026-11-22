@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e1b4b"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#312e81"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="pin" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- macOS Rounded App Icon Canvas -->
+  <rect x="64" y="64" width="896" height="896" rx="200" ry="200" fill="url(#bg)" stroke="#334155" stroke-width="10"/>
+
+  <!-- Subtle Inner Glow Ring -->
+  <rect x="92" y="92" width="840" height="840" rx="176" ry="176" fill="none" stroke="#6366f1" stroke-opacity="0.25" stroke-width="4"/>
+
+  <!-- CPU Pins: Top & Bottom -->
+  <g fill="url(#pin)" opacity="0.9">
+    <!-- Top pins -->
+    <rect x="304" y="180" width="28" height="72" rx="8"/>
+    <rect x="382" y="180" width="28" height="72" rx="8"/>
+    <rect x="460" y="180" width="28" height="72" rx="8"/>
+    <rect x="538" y="180" width="28" height="72" rx="8"/>
+    <rect x="616" y="180" width="28" height="72" rx="8"/>
+    <rect x="694" y="180" width="28" height="72" rx="8"/>
+    <!-- Bottom pins -->
+    <rect x="304" y="772" width="28" height="72" rx="8"/>
+    <rect x="382" y="772" width="28" height="72" rx="8"/>
+    <rect x="460" y="772" width="28" height="72" rx="8"/>
+    <rect x="538" y="772" width="28" height="72" rx="8"/>
+    <rect x="616" y="772" width="28" height="72" rx="8"/>
+    <rect x="694" y="772" width="28" height="72" rx="8"/>
+    <!-- Left pins -->
+    <rect x="180" y="304" width="72" height="28" rx="8"/>
+    <rect x="180" y="382" width="72" height="28" rx="8"/>
+    <rect x="180" y="460" width="72" height="28" rx="8"/>
+    <rect x="180" y="538" width="72" height="28" rx="8"/>
+    <rect x="180" y="616" width="72" height="28" rx="8"/>
+    <rect x="180" y="694" width="72" height="28" rx="8"/>
+    <!-- Right pins -->
+    <rect x="772" y="304" width="72" height="28" rx="8"/>
+    <rect x="772" y="382" width="72" height="28" rx="8"/>
+    <rect x="772" y="460" width="72" height="28" rx="8"/>
+    <rect x="772" y="538" width="72" height="28" rx="8"/>
+    <rect x="772" y="616" width="72" height="28" rx="8"/>
+    <rect x="772" y="694" width="72" height="28" rx="8"/>
+  </g>
+
+  <!-- Central 8086 Silicon Die Body -->
+  <rect x="248" y="248" width="528" height="528" rx="72" ry="72" fill="url(#chip)" stroke="url(#accent)" stroke-width="14"/>
+  <rect x="282" y="282" width="460" height="460" rx="48" ry="48" fill="#0b1120" stroke="#475569" stroke-opacity="0.5" stroke-width="4"/>
+
+  <!-- Pin-1 Orientation Notch -->
+  <circle cx="330" cy="330" r="14" fill="#38bdf8" opacity="0.85"/>
+
+  <!-- Typography: EMU / 8086 -->
+  <text x="512" y="465" text-anchor="middle" font-family="SF Mono, Menlo, Monaco, monospace" font-size="78" font-weight="700" letter-spacing="14" fill="#94a3b8">EMU</text>
+  <text x="512" y="612" text-anchor="middle" font-family="SF Mono, Menlo, Monaco, monospace" font-size="168" font-weight="800" letter-spacing="4" fill="url(#accent)">8086</text>
+  <text x="512" y="690" text-anchor="middle" font-family="SF Pro Display, Helvetica Neue, sans-serif" font-size="40" font-weight="600" letter-spacing="8" fill="#fbbf24">MACOS</text>
+</svg>

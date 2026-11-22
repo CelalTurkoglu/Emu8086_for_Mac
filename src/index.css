@@ -1,0 +1,51 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  html {
+    background-color: #f4f4f5;
+    color-scheme: light;
+  }
+
+  html.dark {
+    background-color: #1c1c1e;
+    color-scheme: dark;
+  }
+}
+
+.macos-drag {
+  -webkit-app-region: drag;
+}
+
+.macos-no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Subtle macOS-style scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(113, 113, 122, 0.35);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(113, 113, 122, 0.55);
+}

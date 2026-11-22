@@ -1,0 +1,93 @@
+{
+  "name": "emu8086-mac",
+  "productName": "EMU8086 Mac",
+  "version": "0.1.0",
+  "description": "Native macOS educational Intel 8086 Microprocessor Emulator (emu8086 alternative)",
+  "author": "Celal Türkoğlu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CelalTurkoglu/Emu8086_for_Mac.git"
+  },
+  "homepage": "https://github.com/CelalTurkoglu/Emu8086_for_Mac#readme",
+  "private": true,
+  "main": "dist-electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"npm:dev:vite\" \"npm:dev:electron\"",
+    "dev:vite": "vite",
+    "dev:electron": "npm run build:electron && wait-on http://localhost:5173 && ELECTRON_START_URL=http://localhost:5173 electron .",
+    "build": "tsc --noEmit && vite build && npm run build:electron",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "pack:mac": "npm run build && node build/pack-mac.mjs --arm64",
+    "pack:mac:universal": "npm run build && node build/pack-mac.mjs --universal",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
+    "test": "vitest run --pool=forks --no-file-parallelism",
+    "test:watch": "vitest --pool=forks"
+  },
+  "build": {
+    "appId": "com.emu8086mac.app",
+    "productName": "EMU8086 Mac",
+    "afterPack": "build/afterPack.js",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "!node_modules/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.education",
+      "icon": "build/icon.icns",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "dmg": {
+      "title": "EMU8086 Mac",
+      "icon": "build/icon.icns",
+      "contents": [
+        {
+          "x": 140,
+          "y": 180
+        },
+        {
+          "x": 400,
+          "y": 180,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ],
+      "window": {
+        "width": 540,
+        "height": 340
+      }
+    }
+  },
+  "dependencies": {
+    "docx": "^9.16.0",
+    "lucide-react": "^0.469.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^9.1.2",
+    "electron": "^33.3.1",
+    "electron-builder": "^26.18.0",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.6",
+    "vitest": "^2.1.8",
+    "wait-on": "^8.0.1"
+  }
+}
